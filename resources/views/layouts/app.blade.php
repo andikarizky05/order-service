@@ -111,9 +111,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}" href="{{ route('orders.index') }}">
+                            <a class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}" href="{{ route('orders.index') }}">
                                 <i class="bi bi-cart me-2"></i>
-                                Orders
+                                All Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('orders.completed') ? 'active' : '' }}" href="{{ route('orders.completed') }}">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Completed Orders
                             </a>
                         </li>
                         <li class="nav-item">

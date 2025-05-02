@@ -10,6 +10,11 @@
             <a href="{{ route('orders.index') }}" class="btn btn-sm btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back to Orders
             </a>
+            @if($order->status === 'pending')
+            <button id="completeOrderBtn" class="btn btn-sm btn-success">
+                <i class="bi bi-check-circle"></i> Mark as Completed
+            </button>
+            @endif
         </div>
     </div>
 </div>
@@ -177,4 +182,36 @@
         font-size: 1rem;
     }
 </style>
+
+@if($order->status === 'pending')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('completeOrderBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to mark this order as completed?')) {
+                fetch('/api/orders/{{ $order->id }}/complete', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert('Order marked as completed successfully!');
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + (data.error || 'Unknown error occurred'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to complete the order. Please try again.');
+                });
+            }
+        });
+    });
+</script>
+@endif
 @endsection

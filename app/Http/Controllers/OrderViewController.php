@@ -140,4 +140,19 @@ class OrderViewController extends Controller
         
         return view('orders.create', compact('users', 'products'));
     }
+
+    /**
+     * Display a listing of completed orders.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function completedOrders()
+    {
+        $orders = Order::with('items')
+            ->where('status', 'completed')
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10);
+            
+        return view('orders.completed', compact('orders'));
+    }
 }

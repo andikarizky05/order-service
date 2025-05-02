@@ -184,4 +184,58 @@ class OrderController extends Controller
             
         return response()->json($orders);
     }
+
+    /**
+     * Update order status to completed.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function completeOrder($id)
+    {
+        $order = Order::find($id);
+        
+        if (!$order) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+        
+        if ($order->status === 'completed') {
+            return response()->json(['message' => 'Order is already completed', 'order' => $order]);
+        }
+        
+        try {
+            DB::beginTransaction();
+            
+            $order->status = 'completed';
+            $order->save();
+            
+            DB::commit();
+            
+            Log::info("Order ID {$id} marked as completed");
+            
+            return response()->json([
+                'message' => 'Order marked as completed successfully',
+                'order' => $order
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Failed to complete order: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to complete order'], 500);
+        }
+    }
+
+    /**
+     * Get all completed orders.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getCompletedOrders()
+    {
+        $completedOrders = Order::with('items')
+            ->where('status', 'completed')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+            
+        return response()->json($completedOrders);
+    }
 }
